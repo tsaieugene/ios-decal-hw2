@@ -12,8 +12,75 @@ class KeyboardViewController: UIInputViewController {
 
     @IBOutlet var nextKeyboardButton: UIButton!
     
+    @IBOutlet var Display: UILabel!
+    
     var keyboardView: UIView!
+    
+    var needToClear = true
+    
+    var first:Float = 0
+    
+    var second:Float = 0
+    
+    var operation = ""
+    
+    @IBAction func numberPressed(sender: AnyObject) {
+        if needToClear{
+            deleteDisplay()
+            needToClear = false
+        }
+        if let numStr = sender.currentTitle {
+            let numNSString = numStr! as NSString
+            if let current = Display?.text! {
+                Display.text = "\(current)\(numNSString.intValue)"
+            } else {
+                Display.text = "\(numNSString.intValue)"
+            }
+        }
+    }
+    
+    
+    @IBAction func operationPressed(sender: AnyObject) {
+        first = Float(Display.text!)!
+        operation = sender.currentTitle!!
+        deleteDisplay()
+    }
+    
+    @IBAction func returnPressed(sender: AnyObject) {
+        second = Float(Display.text!)!
+        var answer:Float = 0
+        if operation == "+"{
+            answer = first + second
+        } else if operation == "-"{
+            answer = first - second
+        } else if operation == "*"{
+            answer = first * second
+        } else if operation == "/"{
+            answer = first / second
+        }
+        Display.text = "\(answer)"
+    }
+    @IBAction func deletePressed(sender: AnyObject) {
+        let textProxy = textDocumentProxy as UITextDocumentProxy
+            textProxy.deleteBackward()
+        deleteDisplay()
+        needToClear = true
+    }
+    
+    @IBAction func showPressed(sender: AnyObject) {
+        let textProxy = textDocumentProxy as UITextDocumentProxy
+        if let number = Display?.text as String? {
+            textProxy.insertText(number)
+        }
+        deleteDisplay()
+        needToClear = true
+    }
 
+    func deleteDisplay() {
+        Display.text = ""
+    }
+    
+    
     override func updateViewConstraints() {
         super.updateViewConstraints()
     
@@ -23,6 +90,7 @@ class KeyboardViewController: UIInputViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         loadInterface()
+        deleteDisplay()
     }
 
     override func didReceiveMemoryWarning() {
